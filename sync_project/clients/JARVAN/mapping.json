@@ -1,0 +1,37 @@
+{
+    "JAR-93": {
+        "freshdesk_id": 1387,
+        "last_jira_update": "2025-08-13T22:32:25.495000+00:00",
+        "last_freshdesk_update": "2025-08-13T22:04:42.253077+00:00",
+        "synced_attachments": []
+    },
+    "JAR-102": {
+        "freshdesk_id": 1390,
+        "last_jira_update": "2025-08-13T22:51:36.424000+00:00",
+        "last_freshdesk_update": "2025-08-13T22:52:49+00:00",
+        "synced_attachments": [
+            "fd-158001290057",
+            "jira-10135"
+        ]
+    },
+    "JAR-103": {
+        "freshdesk_id": 1391,
+        "last_jira_update": "2025-08-13T22:54:43.250000+00:00",
+        "last_freshdesk_update": "2025-08-13T22:54:30+00:00",
+        "synced_attachments": [
+            "fd-158001290252",
+            "jira-10136"
+        ]
+    },
+    "JAR-104": {
+        "freshdesk_id": 1392,
+        "last_jira_update": "2025-08-13T23:02:19.145000+00:00",
+        "last_freshdesk_update": "2025-08-13T23:02:24+00:00",
+        "synced_attachments": [
+            "fd-158001290318",
+            "jira-10137",
+            "fd-158001290319",
+            "jira-10138"
+        ]
+    }
+}

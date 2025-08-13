@@ -82,7 +82,9 @@ def _sync_jira_to_freshdesk(jira_tickets, mapping, config):
                 "Concluído": 4,    # 4 = Resolvido
                 "Resolved": 4,     # 4 = Resolvido
                 "Closed": 5,       # 5 = Fechado
-                "Fechado": 5       # 5 = Fechado
+                "Fechado": 5,          # 5 = Fechado
+                "Backlog": 2     # 2 = Aberto
+            
             }
             
             # Pega o nome exato do status vindo do Jira

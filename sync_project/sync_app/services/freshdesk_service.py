@@ -135,5 +135,5 @@ def update_freshdesk_ticket_status(ticket_id, status_code, config):
     
     print(f"Atualizando status do ticket Freshdesk {ticket_id} para o código {status_code}...")
     
-    # A atualização de ticket usa o método PUT.
-    return api_request('PUT', url, config['FRESHDESK_AUTH'], json_data=payload)
+    # A atualização de ticket usa o método PATCH (alterado de PUT).
+    return api_request('PATCH', url, config['FRESHDESK_AUTH'], json_data=payload)

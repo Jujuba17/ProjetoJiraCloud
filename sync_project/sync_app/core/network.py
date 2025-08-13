@@ -5,19 +5,6 @@ import os
 def api_request(method, url, auth, json_data=None, params=None, data=None, files=None):
     """
     Realiza uma requisição de API genérica e centralizada.
-
-    Args:
-        method (str): O método HTTP (e.g., 'GET', 'POST').
-        url (str): A URL do endpoint da API.
-        auth (tuple or AuthBase): Objeto de autenticação (e.g., HTTPBasicAuth).
-        json_data (dict, optional): Payload JSON para a requisição.
-        params (dict, optional): Parâmetros de URL.
-        data (dict, optional): Dados de formulário.
-        files (dict, optional): Arquivos para upload.
-
-    Returns:
-        dict or list or bool or None: A resposta JSON da API, True para sucesso
-                                      sem conteúdo, ou None em caso de erro.
     """
     headers = {}
     # Se não estivermos enviando arquivos, o Content-Type é application/json
@@ -55,14 +42,6 @@ def download_attachment(url, file_path, auth=None):
     """
     Baixa um arquivo de uma URL e o salva localmente.
 
-    Args:
-        url (str): A URL do anexo a ser baixado.
-        file_path (str): O caminho completo onde o arquivo será salvo.
-        auth (tuple or AuthBase, optional): Objeto de autenticação, se necessário.
-
-    Returns:
-        bool: True se o download for bem-sucedido e o arquivo não estiver vazio,
-              False caso contrário.
     """
     try:
         # Usamos stream=True para lidar com arquivos grandes de forma eficiente

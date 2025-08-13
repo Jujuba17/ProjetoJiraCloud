@@ -8,12 +8,6 @@ def create_jira_ticket(freshdesk_ticket, config):
     """
     Cria um novo ticket no Jira com base em um ticket do Freshdesk.
 
-    Args:
-        freshdesk_ticket (dict): O objeto completo do ticket do Freshdesk.
-        config (dict): O dicionário de configuração do cliente.
-
-    Returns:
-        dict or None: O objeto do ticket criado no Jira ou None em caso de falha.
     """
     url = f"{config['JIRA_URL']}/rest/api/3/issue"
     description_plain = html_to_text(freshdesk_ticket.get('description', 'Descrição não fornecida.'))
@@ -45,12 +39,6 @@ def fetch_updated_jira_tickets(since_date_str, config):
     """
     Busca tickets do Jira atualizados desde uma data específica.
 
-    Args:
-        since_date_str (str): Data no formato 'YYYY-MM-DD'.
-        config (dict): O dicionário de configuração do cliente.
-
-    Returns:
-        list: Uma lista de tickets do Jira. Retorna lista vazia em caso de falha.
     """
     jql_query = f"project = '{config['JIRA_PROJECT_KEY']}' AND updated >= '{since_date_str}' ORDER BY updated DESC"
     url = f"{config['JIRA_URL']}/rest/api/3/search"
@@ -65,13 +53,6 @@ def add_jira_comment(issue_key, comment_text, config):
     """
     Adiciona um comentário a um ticket existente no Jira.
 
-    Args:
-        issue_key (str): A chave do ticket do Jira (e.g., 'PROJ-123').
-        comment_text (str): O texto do comentário a ser adicionado.
-        config (dict): O dicionário de configuração do cliente.
-
-    Returns:
-        dict or None: O objeto do comentário criado ou None em caso de falha.
     """
     url = f"{config['JIRA_URL']}/rest/api/3/issue/{issue_key}/comment"
     # O corpo do comentário deve estar no formato ADF
@@ -90,13 +71,6 @@ def add_jira_attachment(issue_key, file_path, config):
     Envia um anexo para um ticket do Jira.
     Esta função usa 'requests' diretamente pois a API de anexo do Jira tem um comportamento específico.
 
-    Args:
-        issue_key (str): A chave do ticket do Jira.
-        file_path (str): O caminho do arquivo a ser enviado.
-        config (dict): O dicionário de configuração do cliente.
-
-    Returns:
-        str or None: O ID do anexo criado no Jira ou None em caso de falha.
     """
     url = f"{config['JIRA_URL']}/rest/api/3/issue/{issue_key}/attachments"
     headers = {"X-Atlassian-Token": "no-check"}
