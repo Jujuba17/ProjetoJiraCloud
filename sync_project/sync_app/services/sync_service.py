@@ -7,7 +7,6 @@ from requests.auth import HTTPBasicAuth
 from . import freshdesk_service, jira_service
 from ..core import utils, network
 from ..storage import file_storage
-import os 
 
 def get_temp_attachments_dir(client_name):
     """Cria e retorna o caminho para o diretório de anexos temporários."""
@@ -85,7 +84,6 @@ def _sync_jira_to_freshdesk(jira_tickets, mapping, config):
                 "Closed": 5,       # 5 = Fechado
                 "Fechado": 5,          # 5 = Fechado
                 "Backlog": 2     # 2 = Aberto
-            
             }
             
             # Pega o nome exato do status vindo do Jira
@@ -139,53 +137,57 @@ def _sync_freshdesk_to_jira(freshdesk_tickets, mapping, config):
         
         # Busca as conversas para obter notas, respostas e anexos
         for conv in freshdesk_service.fetch_freshdesk_conversations(fd_id_str, config):
-            # ==================================================================
-            # <<< INÍCIO DA CORREÇÃO >>>
-            # ==================================================================
-            # VERIFICA SE A CONVERSA FOI ORIGINALMENTE SINCRONIZADA DO JIRA.
-            # A verificação é feita no corpo HTML ('body') porque é onde inserimos a tag <i>.
+            # Verifica se a conversa foi inicialmente sincronizada do Jira
             if "<i>Comentário de" in conv.get('body', ''):
-                # Se o marcador for encontrado, pulamos esta conversa para evitar o loop.
                 print(f"  -> Pulando conversa {conv['id']} (origem: Jira).")
                 continue
-            # ==================================================================
-            # <<< FIM DA CORREÇÃO >>>
-            # ==================================================================
-            
-            conv_updated_at = utils.parse_datetime(conv['updated_at'])
-            if not last_sync or (conv_updated_at and conv_updated_at > last_sync):
-                user_name = conv.get('user', {}).get('name', 'Usuário Desconhecido')
-                body_text = conv.get('body_text', '').strip()
-                
-                # Sincronizar comentários/notas
-                if config.get('SYNC_COMMENTS_FRESHDESK_TO_JIRA', True) and body_text:
-                    note_type = "Nota Privada" if conv.get('private', True) else "Resposta Pública"
-                    comment_text = f"_{note_type} de **{user_name}** no Freshdesk:_\n\n{body_text}"
-                    jira_service.add_jira_comment(jira_key, comment_text, config)
 
-                # Sincronizar anexos da conversa
-                if config.get('SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA', True) and conv.get('attachments'):
-                    temp_dir = get_temp_attachments_dir(config['CLIENT_NAME'])
-                    for attachment in conv['attachments']:
-                        attachment_id_fd = f"fd-{attachment['id']}"
-                        if attachment_id_fd in mapping_entry['synced_attachments']:
-                            continue
-                        
-                        print(f"  -> Novo anexo detectado no Freshdesk {fd_id_str}: {attachment['name']}")
-                        file_path = os.path.join(temp_dir, attachment['name'])
-                        if network.download_attachment(attachment['attachment_url'], file_path):
-                            jira_attachment_id = jira_service.add_jira_attachment(jira_key, file_path, config)
-                            if jira_attachment_id:
-                                # Registra ambos os IDs para criar o vínculo
-                                attachment_id_jira = f"jira-{jira_attachment_id}"
-                                mapping_entry['synced_attachments'].append(attachment_id_fd)
-                                mapping_entry['synced_attachments'].append(attachment_id_jira)
-                                print(f"  -> Anexo {attachment_id_fd} mapeado para {attachment_id_jira}.")
-                            os.remove(file_path)
+            conv_updated_at = utils.parse_datetime(conv['updated_at'])
+            user_id = conv.get('user_id')
+            print(f"  --> Processando conversa {conv['id']}...")  # Debug print
+            print(f"  --> ID do Usuário: {user_id}")  # Verifica o ID do usuário
+
+            user_name = 'Usuário Desconhecido'  # Valor padrão
+            if user_id:
+                try:
+                    # Tenta buscar os detalhes do agente
+                    agent_details = freshdesk_service.fetch_freshdesk_agent_details(user_id, config)
+                    #print(f"  --> Detalhes do Agente: {agent_details}")  # Verifica o nome retornado do agente
+                    if agent_details and 'contact' in agent_details:
+                        user_name = agent_details['contact'].get('name', 'Usuário Desconhecido')
+                    else:
+                        print(f"  --> Detalhes do agente não encontrados para o user_id: {user_id}")
+                except Exception as e:
+                    print(f"  -> Erro ao obter nome do usuário {user_id} do Freshdesk: {e}")
+            else:
+                print("  --> User ID não encontrado na conversa.")
+
+            body_text = conv.get('body_text', '').strip()
+            if config.get('SYNC_COMMENTS_FRESHDESK_TO_JIRA', True) and body_text:
+                note_type = "Nota Privada" if conv.get('private', True) else "Comentário" 
+                comment_text = f"{note_type} de {user_name} no Freshdesk:\n\n{body_text}"
+                jira_service.add_jira_comment(jira_key, comment_text, config)
+               
+            # Sincronizar anexos da conversa
+            if config.get('SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA', True) and conv.get('attachments'):
+                temp_dir = get_temp_attachments_dir(config['CLIENT_NAME'])
+                for attachment in conv['attachments']:
+                    attachment_id_fd = f"fd-{attachment['id']}"
+                    if attachment_id_fd in mapping_entry['synced_attachments']:
+                        continue
+                    
+                    print(f"  -> Novo anexo detectado no Freshdesk {fd_id_str}: {attachment['name']}")
+                    file_path = os.path.join(temp_dir, attachment['name'])
+                    if network.download_attachment(attachment['attachment_url'], file_path):
+                        jira_attachment_id = jira_service.add_jira_attachment(jira_key, file_path, config)
+                        if jira_attachment_id:
+                            attachment_id_jira = f"jira-{jira_attachment_id}"
+                            mapping_entry['synced_attachments'].append(attachment_id_fd)
+                            mapping_entry['synced_attachments'].append(attachment_id_jira)
+                            print(f"  -> Anexo {attachment_id_fd} mapeado para {attachment_id_jira}.")
+                        os.remove(file_path)
 
         mapping_entry['last_freshdesk_update'] = fd_updated_at.isoformat()
-
-  
 
 def _find_and_map_new_freshdesk_tickets(freshdesk_tickets, mapping, config):
     """Encontra novos tickets no Freshdesk e os cria no Jira, atualizando o mapeamento."""
@@ -267,8 +269,6 @@ def _find_and_map_new_freshdesk_tickets(freshdesk_tickets, mapping, config):
             else:
                 print(f"ERRO: A criação do ticket Jira para o Freshdesk {fd_id_str} falhou.")
 
-
-
 def run_sync_for_client(config, mapping_data, mapping_path):
     """
     Executa o ciclo de sincronização completo para um único cliente.
@@ -323,7 +323,7 @@ def process_client(client_folder_path, client_name):
     config['SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA'] = os.getenv('SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA', str(config.get('SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA', False))).lower() == 'true'  
     config['FRESHDESK_COMPANY_ID'] = os.getenv('FRESHDESK_COMPANY_ID', str(config.get('FRESHDESK_COMPANY_ID', '')))  
 
-    print(f"Configurações finais para {client_name}: {config}")  # Debug  
+    #print(f"Configurações finais para {client_name}: {config}")  # Debug  
 
     mapping_data = file_storage.load_mapping_data(mapping_path)  
 
@@ -342,22 +342,5 @@ def process_client(client_folder_path, client_name):
     except Exception as e:  
         print(f"ERRO INESPERADO durante a sincronização de {client_name}: {e}")  
         import traceback  
-        traceback.print_exc()  
-
-def run_sync_for_client(config, mapping_data, mapping_path):  
-    sync_days_ago = config.get("SYNC_DAYS_AGO", 1)  
-    since_date = (datetime.now(timezone.utc) - timedelta(days=sync_days_ago)).strftime('%Y-%m-%d')  
-    print(f"\nBuscando tickets atualizados desde {since_date}...")  
-
-    jira_tickets = jira_service.fetch_updated_jira_tickets(since_date, config)  
-    freshdesk_tickets = freshdesk_service.fetch_updated_freshdesk_tickets(since_date, config)  
-
-    if jira_tickets is None or freshdesk_tickets is None:  
-        print("Falha ao buscar tickets de uma das plataformas. Abortando a sincronização para este cliente.")  
-        return  
-
-    _find_and_map_new_freshdesk_tickets(freshdesk_tickets, mapping_data, config)  
-    _sync_jira_to_freshdesk(jira_tickets, mapping_data, config)  
-    _sync_freshdesk_to_jira(freshdesk_tickets, mapping_data, config)  
-
-    file_storage.save_mapping_data(mapping_path, mapping_data)  
+        traceback.print_exc()
+		

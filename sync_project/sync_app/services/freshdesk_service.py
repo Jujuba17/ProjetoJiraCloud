@@ -137,3 +137,21 @@ def update_freshdesk_ticket_status(ticket_id, status_code, config):
     
     # A atualização de ticket usa o método PATCH (alterado de PUT).
     return api_request('PATCH', url, config['FRESHDESK_AUTH'], json_data=payload)
+
+def fetch_freshdesk_agent_details(user_id, config):
+ """
+ Busca os detalhes de um agente específico do Freshdesk.
+
+
+ Args:
+ user_id (int or str): O ID do agente do Freshdesk.
+ config (dict): O dicionário de configuração do cliente.
+
+
+ Returns:
+ dict or None: O objeto completo do agente ou None em caso de falha.
+ """
+ url = f"https://{config['FRESHDESK_DOMAIN']}.freshdesk.com/api/v2/agents/{user_id}"
+ return api_request('GET', url, config['FRESHDESK_AUTH'])
+ 
+ 

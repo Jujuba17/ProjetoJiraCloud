@@ -1,1 +1,107 @@
-{}
+{
+    "JAR-23": {
+        "freshdesk_id": 1419,
+        "last_jira_update": "2025-08-14T19:57:00.271000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:56:35+00:00",
+        "synced_attachments": [
+            "fd-158001305036",
+            "jira-10046"
+        ]
+    },
+    "JAR-24": {
+        "freshdesk_id": 1418,
+        "last_jira_update": "2025-08-14T19:57:05.730000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:56:34+00:00",
+        "synced_attachments": []
+    },
+    "JAR-25": {
+        "freshdesk_id": 1413,
+        "last_jira_update": "2025-08-14T19:53:59.748000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:56:31+00:00",
+        "synced_attachments": []
+    },
+    "JAR-26": {
+        "freshdesk_id": 1417,
+        "last_jira_update": "2025-08-14T19:54:06.721000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:56:30+00:00",
+        "synced_attachments": []
+    },
+    "JAR-27": {
+        "freshdesk_id": 1415,
+        "last_jira_update": "2025-08-14T19:40:07.496000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:45:03+00:00",
+        "synced_attachments": []
+    },
+    "JAR-28": {
+        "freshdesk_id": 1414,
+        "last_jira_update": "2025-08-14T19:40:10.763000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:45:02+00:00",
+        "synced_attachments": [
+            "fd-158001302561",
+            "jira-10047"
+        ]
+    },
+    "JAR-29": {
+        "freshdesk_id": 1421,
+        "last_jira_update": "2025-08-14T19:56:58.847000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:56:36+00:00",
+        "synced_attachments": [
+            "fd-158001305256",
+            "jira-10048"
+        ]
+    },
+    "JAR-30": {
+        "freshdesk_id": 1422,
+        "last_jira_update": "2025-08-14T19:54:07.707000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:55:48+00:00",
+        "synced_attachments": []
+    },
+    "JAR-31": {
+        "freshdesk_id": 1423,
+        "last_jira_update": "2025-08-14T19:55:48.005000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:56:19+00:00",
+        "synced_attachments": []
+    },
+    "JAR-32": {
+        "freshdesk_id": 1425,
+        "last_jira_update": "2025-08-14T19:59:39.787000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:28.797132+00:00",
+        "synced_attachments": []
+    },
+    "JAR-33": {
+        "freshdesk_id": 1420,
+        "last_jira_update": "2025-08-14T19:59:43.413000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:30.206322+00:00",
+        "synced_attachments": [
+            "fd-158001305123",
+            "jira-10049"
+        ]
+    },
+    "JAR-34": {
+        "freshdesk_id": 1412,
+        "last_jira_update": "2025-08-14T19:59:47.006000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:34.271659+00:00",
+        "synced_attachments": [
+            "fd-158001300045",
+            "jira-10050"
+        ]
+    },
+    "JAR-35": {
+        "freshdesk_id": 1411,
+        "last_jira_update": "2025-08-14T19:59:49.842000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:37.049290+00:00",
+        "synced_attachments": [
+            "fd-158001299949",
+            "jira-10051"
+        ]
+    },
+    "JAR-36": {
+        "freshdesk_id": 1416,
+        "last_jira_update": "2025-08-14T20:01:52.762608+00:00",
+        "last_freshdesk_update": "2025-08-14T20:01:52.762608+00:00",
+        "synced_attachments": [
+            "fd-158001302726",
+            "jira-10052"
+        ]
+    }
+}

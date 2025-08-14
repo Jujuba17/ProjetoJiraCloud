@@ -1,1 +1,71 @@
-{}
+{
+    "JAR-133": {
+        "freshdesk_id": 1419,
+        "last_jira_update": "2025-08-14T19:59:25.180000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:14+00:00",
+        "synced_attachments": [
+            "fd-158001305036",
+            "jira-10155"
+        ]
+    },
+    "JAR-134": {
+        "freshdesk_id": 1418,
+        "last_jira_update": "2025-08-14T19:59:30.600000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:20+00:00",
+        "synced_attachments": []
+    },
+    "JAR-135": {
+        "freshdesk_id": 1413,
+        "last_jira_update": "2025-08-14T19:59:33.065000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:15+00:00",
+        "synced_attachments": []
+    },
+    "JAR-136": {
+        "freshdesk_id": 1417,
+        "last_jira_update": "2025-08-14T19:59:36.706000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:18+00:00",
+        "synced_attachments": []
+    },
+    "JAR-137": {
+        "freshdesk_id": 1415,
+        "last_jira_update": "2025-08-14T19:42:33.195000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:45:03+00:00",
+        "synced_attachments": []
+    },
+    "JAR-138": {
+        "freshdesk_id": 1414,
+        "last_jira_update": "2025-08-14T19:42:34.416000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:45:02+00:00",
+        "synced_attachments": [
+            "fd-158001302561",
+            "jira-10156"
+        ]
+    },
+    "JAR-139": {
+        "freshdesk_id": 1421,
+        "last_jira_update": "2025-08-14T19:59:23.827000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:13+00:00",
+        "synced_attachments": [
+            "fd-158001305256",
+            "jira-10157"
+        ]
+    },
+    "JAR-140": {
+        "freshdesk_id": 1422,
+        "last_jira_update": "2025-08-14T19:56:49.336000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:16+00:00",
+        "synced_attachments": []
+    },
+    "JAR-141": {
+        "freshdesk_id": 1423,
+        "last_jira_update": "2025-08-14T19:56:38.361000+00:00",
+        "last_freshdesk_update": "2025-08-14T19:59:21+00:00",
+        "synced_attachments": []
+    },
+    "JAR-142": {
+        "freshdesk_id": 1424,
+        "last_jira_update": "2025-08-14T19:59:12.859000+00:00",
+        "last_freshdesk_update": "2025-08-14T20:00:53+00:00",
+        "synced_attachments": []
+    }
+}
