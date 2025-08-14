@@ -7,6 +7,7 @@ from requests.auth import HTTPBasicAuth
 from . import freshdesk_service, jira_service
 from ..core import utils, network
 from ..storage import file_storage
+import os 
 
 def get_temp_attachments_dir(client_name):
     """Cria e retorna o caminho para o diretório de anexos temporários."""
@@ -299,39 +300,64 @@ def run_sync_for_client(config, mapping_data, mapping_path):
     # 4. Salvar o estado do mapeamento
     file_storage.save_mapping_data(mapping_path, mapping_data)
 
-def process_client(client_folder_path, client_name):
-    """
-    Processa um cliente: carrega configuração, prepara autenticação e inicia a sincronização.
+def process_client(client_folder_path, client_name):  
+    print(f"\n{'─'*25} Processando cliente: {client_name.upper()} {'─'*25}")  
+    config_path = os.path.join(client_folder_path, 'config.json')  
+    mapping_path = os.path.join(client_folder_path, 'mapping.json')  
 
-    Args:
-        client_folder_path (str): Caminho para a pasta do cliente.
-        client_name (str): Nome do cliente.
-    """
-    print(f"\n{'─'*25} Processando cliente: {client_name.upper()} {'─'*25}")
-    config_path = os.path.join(client_folder_path, 'config.json')
-    mapping_path = os.path.join(client_folder_path, 'mapping.json')
+    config = file_storage.load_client_config(config_path)  
+    if not config:  
+        return  
 
-    # Carrega config e mapping usando o módulo de storage
-    config = file_storage.load_client_config(config_path)
-    if not config:
-        return
-        
-    mapping_data = file_storage.load_mapping_data(mapping_path)
-    
-    # Adiciona dados dinâmicos à configuração
-    config['CLIENT_NAME'] = client_name
-    
-    try:
-        config['JIRA_AUTH'] = HTTPBasicAuth(config['JIRA_USER_EMAIL'], config['JIRA_API_TOKEN'])
-        config['FRESHDESK_AUTH'] = (config['FRESHDESK_API_KEY'], 'X')
-    except KeyError as e:
-        print(f"ERRO DE CONFIGURAÇÃO: A chave {e} está faltando no config.json de {client_name}. Pulando.")
-        return
-        
-    try:
-        run_sync_for_client(config, mapping_data, mapping_path)
-        print(f"Cliente {client_name.upper()} processado com sucesso.")
-    except Exception as e:
-        print(f"ERRO INESPERADO durante a sincronização de {client_name}: {e}")
-        import traceback
-        traceback.print_exc()
+    # Sobrescrever configurações com variáveis de ambiente  
+    config['JIRA_URL'] = os.getenv('JIRA_URL', config.get('JIRA_URL', ''))  
+    config['JIRA_USER_EMAIL'] = os.getenv('JIRA_USER_EMAIL', config.get('JIRA_USER_EMAIL', ''))  
+    config['JIRA_API_TOKEN'] = os.getenv('JIRA_API_TOKEN', config.get('JIRA_API_TOKEN', ''))  
+    config['JIRA_PROJECT_KEY'] = os.getenv('JIRA_PROJECT_KEY', config.get('JIRA_PROJECT_KEY', ''))  
+    config['FRESHDESK_DOMAIN'] = os.getenv('FRESHDESK_DOMAIN', config.get('FRESHDESK_DOMAIN', ''))  
+    config['FRESHDESK_API_KEY'] = os.getenv('FRESHDESK_API_KEY', config.get('FRESHDESK_API_KEY', ''))  
+    config['SYNC_STATUS_JIRA_TO_FRESHDESK'] = os.getenv('SYNC_STATUS_JIRA_TO_FRESHDESK', str(config.get('SYNC_STATUS_JIRA_TO_FRESHDESK', False))).lower() == 'true'  
+    config['SYNC_COMMENTS_JIRA_TO_FRESHDESK'] = os.getenv('SYNC_COMMENTS_JIRA_TO_FRESHDESK', str(config.get('SYNC_COMMENTS_JIRA_TO_FRESHDESK', False))).lower() == 'true'  
+    config['SYNC_COMMENTS_FRESHDESK_TO_JIRA'] = os.getenv('SYNC_COMMENTS_FRESHDESK_TO_JIRA', str(config.get('SYNC_COMMENTS_FRESHDESK_TO_JIRA', False))).lower() == 'true'  
+    config['SYNC_ATTACHMENTS_JIRA_TO_FRESHDESK'] = os.getenv('SYNC_ATTACHMENTS_JIRA_TO_FRESHDESK', str(config.get('SYNC_ATTACHMENTS_JIRA_TO_FRESHDESK', False))).lower() == 'true'  
+    config['SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA'] = os.getenv('SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA', str(config.get('SYNC_ATTACHMENTS_FRESHDESK_TO_JIRA', False))).lower() == 'true'  
+    config['FRESHDESK_COMPANY_ID'] = os.getenv('FRESHDESK_COMPANY_ID', str(config.get('FRESHDESK_COMPANY_ID', '')))  
+
+    print(f"Configurações finais para {client_name}: {config}")  # Debug  
+
+    mapping_data = file_storage.load_mapping_data(mapping_path)  
+
+    config['CLIENT_NAME'] = client_name  
+
+    try:  
+        config['JIRA_AUTH'] = HTTPBasicAuth(config['JIRA_USER_EMAIL'], config['JIRA_API_TOKEN'])  
+        config['FRESHDESK_AUTH'] = (config['FRESHDESK_API_KEY'], 'X')  
+    except KeyError as e:  
+        print(f"ERRO DE CONFIGURAÇÃO: A chave {e} está faltando no config.json de {client_name}. Pulando.")  
+        return  
+
+    try:  
+        run_sync_for_client(config, mapping_data, mapping_path)  
+        print(f"Cliente {client_name.upper()} processado com sucesso.")  
+    except Exception as e:  
+        print(f"ERRO INESPERADO durante a sincronização de {client_name}: {e}")  
+        import traceback  
+        traceback.print_exc()  
+
+def run_sync_for_client(config, mapping_data, mapping_path):  
+    sync_days_ago = config.get("SYNC_DAYS_AGO", 1)  
+    since_date = (datetime.now(timezone.utc) - timedelta(days=sync_days_ago)).strftime('%Y-%m-%d')  
+    print(f"\nBuscando tickets atualizados desde {since_date}...")  
+
+    jira_tickets = jira_service.fetch_updated_jira_tickets(since_date, config)  
+    freshdesk_tickets = freshdesk_service.fetch_updated_freshdesk_tickets(since_date, config)  
+
+    if jira_tickets is None or freshdesk_tickets is None:  
+        print("Falha ao buscar tickets de uma das plataformas. Abortando a sincronização para este cliente.")  
+        return  
+
+    _find_and_map_new_freshdesk_tickets(freshdesk_tickets, mapping_data, config)  
+    _sync_jira_to_freshdesk(jira_tickets, mapping_data, config)  
+    _sync_freshdesk_to_jira(freshdesk_tickets, mapping_data, config)  
+
+    file_storage.save_mapping_data(mapping_path, mapping_data)  

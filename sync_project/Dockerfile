@@ -1,20 +1,15 @@
-# Usa uma imagem base do Python (versão 3.9 ou superior)
-FROM python:3.9-slim-buster
+FROM python:3.9-slim-bullseye
 
-# Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia os arquivos de dependência (requirements.txt)
-COPY requirements.txt .
+RUN apt-get update && apt-get install -y jq dos2unix && rm -rf /var/lib/apt/lists/*
 
-# Instala as dependências
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copia o resto do código fonte
 COPY . .
 
-# Define a variável de ambiente PYTHONUNBUFFERED para imprimir os logs em tempo real
-ENV PYTHONUNBUFFERED=1
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Comando para executar o serviço
-CMD ["python", "main.py"]
+
+RUN dos2unix /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
